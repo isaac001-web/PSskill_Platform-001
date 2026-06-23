@@ -1,0 +1,92 @@
+﻿
+@{
+    ViewData["Title"] = "Forgot Password";
+    Layout = "_Layout";
+}
+
+<div class="d-flex justify-content-center align-items-center"
+     style="min-height:70vh;">
+    <div class="card border-0 shadow-sm rounded-4 p-4"
+         style="width:100%;max-width:440px;">
+
+        <div class="text-center mb-4">
+            <div style="width:56px;height:56px;border-radius:50%;
+                background:#eff6ff;display:flex;
+                align-items:center;justify-content:center;
+                margin:0 auto 12px;">
+                <i class="bi bi-shield-lock"
+                   style="font-size:1.6rem;color:#1d4ed8;"></i>
+            </div>
+            <h5 class="fw-bold mb-1">Forgot your password?</h5>
+            <p class="text-muted" style="font-size:0.88rem;">
+                Enter your registered email and full name.
+                We'll send a 6-digit reset code to your email.
+            </p>
+        </div>
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger rounded-3 py-2 px-3"
+                 style="font-size:0.87rem;">
+                <i class="bi bi-exclamation-circle me-1"></i>
+                @TempData["Error"]
+            </div>
+        }
+
+        <form method="post"
+              asp-action="Verify"
+              asp-controller="ForgotPassword">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold"
+                       style="font-size:0.88rem;">
+                    Email Address
+                </label>
+                <div class="input-group">
+                    <span class="input-group-text
+                        bg-light border-end-0">
+                        <i class="bi bi-envelope text-muted"></i>
+                    </span>
+                    <input type="email" name="email" required
+                           class="form-control border-start-0 ps-0"
+                           placeholder="you@example.com" />
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold"
+                       style="font-size:0.88rem;">
+                    Full Name
+                </label>
+                <div class="input-group">
+                    <span class="input-group-text
+                        bg-light border-end-0">
+                        <i class="bi bi-person text-muted"></i>
+                    </span>
+                    <input type="text" name="fullName" required
+                           class="form-control border-start-0 ps-0"
+                           placeholder="As registered on PSskill" />
+                </div>
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary w-100
+                rounded-pill fw-semibold py-2">
+                <i class="bi bi-send me-1"></i>
+                Send Reset Code
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <a asp-area="Identity"
+               asp-page="/Account/Login"
+               class="text-muted"
+               style="font-size:0.85rem;">
+                <i class="bi bi-arrow-left me-1"></i>
+                Back to Login
+            </a>
+        </div>
+
+    </div>
+</div>

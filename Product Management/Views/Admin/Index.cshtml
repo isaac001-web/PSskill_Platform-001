@@ -1,0 +1,330 @@
+﻿@model IEnumerable<Product_Management.Models.Product>
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container mt-5">
+
+    <!-- HEADER -->
+    <div class="mb-5">
+
+        <h1 class="fw-bold">
+            Admin Dashboard
+        </h1>
+
+        <p class="text-muted">
+            Store analytics and management.
+        </p>
+
+    </div>
+
+   @*  <!-- STATS -->
+    <div class="row g-4 mb-5">
+
+        <!-- PRODUCTS -->
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body text-center">
+
+                    <h5>Total Products</h5>
+
+                    <h1 class="fw-bold">
+                        @ViewBag.TotalProducts
+                    </h1>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ORDERS -->
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body text-center">
+
+                    <h5>Total Orders</h5>
+
+                    <h1 class="fw-bold">
+                        @ViewBag.TotalOrders
+                    </h1>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- USERS -->
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body text-center">
+
+                    <h5>Total Users</h5>
+
+                    <h1 class="fw-bold">
+                        @ViewBag.TotalUsers
+                    </h1>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- REVENUE -->
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body text-center">
+
+                    <h5>Total Revenue</h5>
+
+                    <h1 class="fw-bold text-success">
+                        ₦@ViewBag.TotalRevenue
+                    </h1>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div> *@
+
+
+
+
+    <!-- STATS -->
+    <div class="row g-4 mb-5">
+
+
+
+
+        <!-- QUICK ACCESS -->
+        <div class="row g-3 mb-5">
+            <div class="col-md-6">
+                <a asp-action="Orders"
+                   class="card border-0 shadow-sm rounded-4
+                    text-decoration-none h-100"
+                   style="background: linear-gradient(135deg,
+                    #1d4ed8, #1e40af);">
+                    <div class="card-body d-flex align-items-center
+                        gap-3 p-4">
+                        <div style="width:52px;height:52px;
+                            background:rgba(255,255,255,0.15);
+                            border-radius:14px;
+                            display:flex;align-items:center;
+                            justify-content:center;
+                            font-size:1.4rem;color:#fff;">
+                            <i class="bi bi-bag-check"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-white fs-6">
+                                Manage Orders
+                            </div>
+                            <div style="color:rgba(255,255,255,0.7);
+                                font-size:0.78rem;">
+                                Track and update order status
+                            </div>
+                        </div>
+                        <i class="bi bi-arrow-right text-white ms-auto"></i>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-6">
+                <a asp-action="Users"
+                   class="card border-0 shadow-sm rounded-4
+                    text-decoration-none h-100"
+                   style="background: linear-gradient(135deg,
+                    #059669, #047857);">
+                    <div class="card-body d-flex align-items-center
+                        gap-3 p-4">
+                        <div style="width:52px;height:52px;
+                            background:rgba(255,255,255,0.15);
+                            border-radius:14px;
+                            display:flex;align-items:center;
+                            justify-content:center;
+                            font-size:1.4rem;color:#fff;">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-white fs-6">
+                                Manage Users
+                            </div>
+                            <div style="color:rgba(255,255,255,0.7);
+                                font-size:0.78rem;">
+                                View, delete and manage roles
+                            </div>
+                        </div>
+                        <i class="bi bi-arrow-right text-white ms-auto"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+
+
+        <!-- PRODUCTS -->
+        <div class="col-md-3">
+            <div class="card dashboard-card border-0 shadow-sm rounded-4">
+                <div class="card-body text-center">
+                    <h5>Total Products</h5>
+                    <div class="stat-value">
+                        @ViewBag.TotalProducts
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ORDERS -->
+        <div class="col-md-3">
+            <div class="card dashboard-card border-0 shadow-sm rounded-4">
+                <div class="card-body text-center">
+                    <h5>Total Orders</h5>
+                    <div class="stat-value">
+                        @ViewBag.TotalOrders
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- USERS -->
+        <div class="col-md-3">
+            <div class="card dashboard-card border-0 shadow-sm rounded-4">
+                <div class="card-body text-center">
+                    <h5>Total Users</h5>
+                    <div class="stat-value">
+                        @ViewBag.TotalUsers
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REVENUE -->
+        <div class="col-md-3">
+            <div class="card dashboard-card border-0 shadow-sm rounded-4">
+                <div class="card-body text-center">
+                    <h5>Total Revenue</h5>
+
+                    <div class="stat-value text-success revenue-value">
+                        ₦@String.Format("{0:N2}", ViewBag.TotalRevenue)
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- LOW STOCK -->
+    <div class="card border-0 shadow-sm rounded-4">
+
+        <div class="card-body">
+
+            <h4 class="fw-bold mb-4">
+
+                Low Stock Products
+
+            </h4>
+
+            <table class="table">
+
+                <thead>
+
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                @item.Name
+                            </td>
+
+                            <td class="text-danger fw-bold">
+                                @item.Quantity
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+@* <style>
+
+    body {
+        background: #f5f7fb;
+    }
+
+</style> *@
+
+<style>
+
+    body {
+        background: #f5f7fb;
+    }
+
+    /* All dashboard cards same size */
+    .dashboard-card {
+        height: 170px;
+    }
+
+        .dashboard-card .card-body {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+    /* Numbers */
+    .stat-value {
+        font-size: 3rem;
+        font-weight: 700;
+        line-height: 1.1;
+    }
+
+    /* Revenue text will shrink instead of expanding card */
+    .revenue-value {
+        font-size: clamp(1.4rem, 2vw, 3rem);
+        overflow-wrap: break-word;
+        word-break: break-word;
+    }
+
+</style>

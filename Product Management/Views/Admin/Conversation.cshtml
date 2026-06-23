@@ -1,0 +1,288 @@
+﻿@model IEnumerable<Product_Management.Models.Message>
+
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Chat";
+    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var chatUser = ViewBag.User as Product_Management.Models.ApplicationUser;
+}
+
+<style>
+    .chat-wrapper {
+        height: calc(100vh - 160px);
+        display: flex;
+        flex-direction: column;
+        background: #efeae2;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    }
+
+    .chat-header {
+        background: #fff;
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #e5e7eb;
+        flex-shrink: 0;
+    }
+
+    .chat-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        background: #efeae2;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4c9b8' fill-opacity='0.3'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .chat-footer {
+        background: #f0f2f5;
+        padding: 12px 16px;
+        border-top: 1px solid #e5e7eb;
+        flex-shrink: 0;
+    }
+
+    .bubble-sent {
+        align-self: flex-end;
+        background: #dcf8c6;
+        color: #111;
+        border-radius: 16px 16px 4px 16px;
+        padding: 10px 14px;
+        max-width: 65%;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.13);
+    }
+
+    .bubble-received {
+        align-self: flex-start;
+        background: #fff;
+        color: #111;
+        border-radius: 16px 16px 16px 4px;
+        padding: 10px 14px;
+        max-width: 65%;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.13);
+    }
+
+        .bubble-sent .meta,
+        .bubble-received .meta {
+            font-size: 0.72rem;
+            color: #888;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .bubble-received .meta {
+            text-align: left;
+        }
+
+        .bubble-received .sender-name {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #e67e22;
+            margin-bottom: 3px;
+        }
+
+    .chat-input {
+        border: none;
+        border-radius: 24px;
+        padding: 12px 20px;
+        background: #fff;
+        font-size: 0.95rem;
+        outline: none;
+        flex: 1;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+
+    .send-btn {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #25d366;
+        border: none;
+        color: #fff;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+        flex-shrink: 0;
+    }
+
+        .send-btn:hover {
+            background: #1ebe5d;
+        }
+
+    .date-divider {
+        text-align: center;
+        margin: 12px 0;
+    }
+
+        .date-divider span {
+            background: #e1f3fb;
+            color: #555;
+            font-size: 0.75rem;
+            padding: 4px 14px;
+            border-radius: 12px;
+        }
+
+    .avatar-sm {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .tick {
+        color: #53bdeb;
+        font-size: 0.75rem;
+    }
+</style>
+
+<div class="container-fluid px-3 py-3">
+    <div class="chat-wrapper">
+
+        <!-- HEADER -->
+        <div class="chat-header">
+            <div class="d-flex align-items-center gap-3">
+                <a asp-action="Inbox"
+                   class="btn btn-light btn-sm rounded-circle">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <img src="~/profiles/@(chatUser?.ProfileImage ?? "default.png")"
+                     class="avatar-sm border border-2 border-warning" />
+                <div>
+                    <div class="fw-bold" style="font-size:1rem;">
+                        @(chatUser?.FullName ?? chatUser?.Email)
+                    </div>
+                    <div style="font-size:0.78rem; color:#888;">
+                        @chatUser?.Email
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-light btn-sm rounded-circle">
+                    <i class="bi bi-three-dots-vertical"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- CHAT BODY -->
+        <div class="chat-body" id="chatBody">
+
+            @if (!Model.Any())
+            {
+                <div class="text-center my-auto">
+                    <div style="background:#fff3cd; border-radius:12px;
+                        padding:16px 24px; display:inline-block;
+                        font-size:0.88rem; color:#856404;">
+                        <i class="bi bi-lock-fill me-1"></i>
+                        No messages yet with this user.
+                    </div>
+                </div>
+            }
+            else
+            {
+                string? lastDate = null;
+
+                @foreach (var item in Model)
+                {
+                    var isMine = item.SenderId == currentUserId;
+                    var dateLabel = item.SentAt.ToString("dd MMM yyyy");
+
+                    if (lastDate != dateLabel)
+                    {
+                        lastDate = dateLabel;
+                        <div class="date-divider">
+                            <span>@dateLabel</span>
+                        </div>
+                    }
+
+                    if (isMine)
+                    {
+                        <div class="bubble-sent">
+                            <div>@item.Content</div>
+                            <div class="meta">
+                                @item.SentAt.ToString("hh:mm tt")
+                                @if (item.IsRead)
+                                {
+                                    <span class="tick ms-1">
+                                        <i class="bi bi-check2-all"></i>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="ms-1" style="color:#aaa;">
+                                        <i class="bi bi-check2"></i>
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex align-items-end gap-2">
+                            <img src="~/profiles/@(chatUser?.ProfileImage ?? "default.png")"
+                                 class="avatar-sm mb-1" />
+                            <div class="bubble-received">
+                                <div class="sender-name">
+                                    @(chatUser?.FullName ?? "User")
+                                </div>
+                                <div>@item.Content</div>
+                                <div class="meta">
+                                    @item.SentAt.ToString("hh:mm tt")
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="chat-footer">
+            <form asp-action="Reply" method="post"
+                  class="d-flex align-items-center gap-2">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="receiverId"
+                       value="@chatUser?.Id" />
+                <button type="button"
+                        class="btn btn-light rounded-circle"
+                        style="width:48px;height:48px;">
+                    <i class="bi bi-emoji-smile fs-5"></i>
+                </button>
+                <input type="text"
+                       name="content"
+                       id="msgInput"
+                       class="chat-input"
+                       placeholder="Type a message"
+                       autocomplete="off"
+                       required />
+                <button type="submit" class="send-btn">
+                    <i class="bi bi-send-fill"></i>
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const chatBody = document.getElementById("chatBody");
+        if (chatBody) chatBody.scrollTop = chatBody.scrollHeight;
+
+        document.getElementById("msgInput")
+            .addEventListener("keydown", function (e) {
+                if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    this.closest("form").submit();
+                }
+            });
+    </script>
+}

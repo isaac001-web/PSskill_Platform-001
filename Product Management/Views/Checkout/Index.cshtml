@@ -1,0 +1,262 @@
+﻿@model Product_Management.Models.Order
+
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<!-- ========================================= -->
+<!-- PAGE CONTAINER -->
+<!-- ========================================= -->
+
+<div class="container mt-5">
+
+    <!-- PAGE TITLE -->
+    <div class="mb-4">
+
+        <h1 class="fw-bold">
+            Checkout
+        </h1>
+
+        <p class="text-muted">
+            Confirm your delivery information before placing your order.
+        </p>
+
+    </div>
+
+    <div class="row g-4">
+
+        <!-- ========================================= -->
+        <!-- CHECKOUT FORM -->
+        <!-- ========================================= -->
+
+        <div class="col-lg-7">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold mb-4">
+                        Delivery Information
+                    </h4>
+
+                    <!-- FORM -->
+                    <form method="post">
+
+                        <!-- VALIDATION ERRORS -->
+                        <div asp-validation-summary="All"
+                             class="text-danger mb-3">
+                        </div>
+
+                        <!-- FULL NAME -->
+                        <div class="mb-3">
+
+                            <label asp-for="CustomerName"
+                                   class="form-label fw-semibold">
+                            </label>
+
+                            <input asp-for="CustomerName"
+                                   class="form-control form-control-lg"
+                                   readonly />
+
+                            <span asp-validation-for="CustomerName"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- EMAIL -->
+                        <div class="mb-3">
+
+                            <label asp-for="Email"
+                                   class="form-label fw-semibold">
+                            </label>
+
+                            <input asp-for="Email"
+                                   class="form-control form-control-lg"
+                                   readonly />
+
+                            <span asp-validation-for="Email"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- PHONE NUMBER -->
+                        <div class="mb-3">
+
+                            <label asp-for="PhoneNumber"
+                                   class="form-label fw-semibold">
+                            </label>
+
+                            <input asp-for="PhoneNumber"
+                                   class="form-control form-control-lg"
+                                   readonly />
+
+                            <span asp-validation-for="PhoneNumber"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- ADDRESS -->
+                        <div class="mb-4">
+
+                            <label asp-for="Address"
+                                   class="form-label fw-semibold">
+                            </label>
+
+                            <textarea asp-for="Address"
+                                      class="form-control form-control-lg"
+                                      rows="4"
+                                      readonly>
+                            </textarea>
+
+                            <span asp-validation-for="Address"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+                        <!-- PROFILE UPDATE NOTICE -->
+                        <div class="alert alert-warning rounded-3">
+
+                            Want to change your delivery details?
+
+                            <a asp-controller="Profile"
+                               asp-action="Index"
+                               class="fw-bold text-decoration-none">
+
+                                Update Profile
+
+                            </a>
+
+                        </div>
+
+                        <!-- PLACE ORDER BUTTON -->
+                        <button type="submit"
+                                class="btn btn-success btn-lg w-100 rounded-pill">
+
+                            Place Order
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ========================================= -->
+        <!-- ORDER SUMMARY -->
+        <!-- ========================================= -->
+
+        <div class="col-lg-5">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold mb-4">
+                        Order Summary
+                    </h4>
+
+                    <!-- INFO -->
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">
+                            Delivery
+                        </span>
+
+                        <span class="fw-semibold text-success">
+                            Free
+                        </span>
+
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">
+                            Payment
+                        </span>
+
+                        <span class="fw-semibold">
+                            Paystack
+                        </span>
+
+                    </div>
+
+                    <hr />
+
+                    <!-- TOTAL -->
+                    <div class="d-flex justify-content-between">
+
+                        <h5 class="fw-bold">
+                            Total
+                        </h5>
+
+                        <h5 class="fw-bold text-success">
+                            Calculated at payment
+                        </h5>
+
+                    </div>
+
+                    <!-- SECURITY -->
+                    <div class="mt-4">
+
+                        <small class="text-muted">
+
+                            🔒 Secure Checkout powered by ASP.NET Core & Paystack
+
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ========================================= -->
+<!-- VALIDATION SCRIPTS -->
+<!-- ========================================= -->
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync(
+            "_ValidationScriptsPartial"
+        );
+    }
+
+}
+
+<!-- ========================================= -->
+<!-- CUSTOM STYLING -->
+<!-- ========================================= -->
+
+<style>
+
+    body {
+        background-color: #f5f7fb;
+    }
+
+    .card {
+        border-radius: 20px;
+    }
+
+    .form-control {
+        border-radius: 12px;
+    }
+
+    .btn-success {
+        padding: 14px;
+        font-weight: 600;
+    }
+
+</style>

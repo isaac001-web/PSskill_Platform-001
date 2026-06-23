@@ -1,0 +1,338 @@
+@* @page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <h2>Create a new account.</h2>
+            <hr />
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <label asp-for="Input.Email">Email</label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                <label asp-for="Input.Password">Password</label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+        </form>
+    </div>
+    <div class="col-md-6 col-md-offset-2">
+        <section>
+            <h3>Use another service to register.</h3>
+            <hr />
+            @{
+                if ((Model.ExternalLogins?.Count ?? 0) == 0)
+                {
+                    <div>
+                        <p>
+                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
+                            about setting up this ASP.NET application to support logging in via external services</a>.
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                        <div>
+                            <p>
+                                @foreach (var provider in Model.ExternalLogins!)
+                                {
+                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                                }
+                            </p>
+                        </div>
+                    </form>
+                }
+            }
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+ *@
+
+
+
+
+@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                min-height: 100vh;
+                background: linear-gradient(135deg, #e8f4fd 0%, #d1e9f6 50%, #bddff0 100%);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                font-family: 'Segoe UI', sans-serif;
+                padding: 20px 0;
+            }
+
+            .brand {
+                text-align: center;
+                margin-bottom: 24px;
+            }
+
+                .brand span.ps {
+                    color: #f5a623;
+                    font-size: 1.8rem;
+                    font-weight: 700;
+                }
+
+                .brand span.skill {
+                    color: #2d6cdf;
+                    font-size: 1.8rem;
+                    font-weight: 700;
+                }
+
+            .card {
+                background: #fff;
+                border-radius: 16px;
+                box-shadow: 0 8px 32px rgba(45,108,223,0.10);
+                padding: 40px 36px 32px;
+                width: 100%;
+                max-width: 420px;
+            }
+
+                .card h2 {
+                    text-align: center;
+                    font-size: 1.6rem;
+                    font-weight: 700;
+                    color: #1a1a2e;
+                    margin-bottom: 6px;
+                }
+
+                .card .subtitle {
+                    text-align: center;
+                    color: #7a8a9a;
+                    font-size: 0.92rem;
+                    margin-bottom: 28px;
+                }
+
+            .input-group-custom {
+                position: relative;
+                margin-bottom: 16px;
+            }
+
+                .input-group-custom label {
+                    display: block;
+                    font-size: 0.88rem;
+                    font-weight: 600;
+                    color: #374151;
+                    margin-bottom: 6px;
+                }
+
+            .input-wrapper {
+                position: relative;
+                display: flex;
+                align-items: center;
+            }
+
+                .input-wrapper .icon {
+                    position: absolute;
+                    left: 14px;
+                    color: #9ca3af;
+                    font-size: 1rem;
+                }
+
+                .input-wrapper input {
+                    width: 100%;
+                    padding: 12px 14px 12px 42px;
+                    border: 1.5px solid #e5e7eb;
+                    border-radius: 10px;
+                    font-size: 0.95rem;
+                    outline: none;
+                    transition: border-color 0.2s;
+                    background: #f9fafb;
+                }
+
+                    .input-wrapper input:focus {
+                        border-color: #2d6cdf;
+                        background: #fff;
+                    }
+
+            .btn-register {
+                width: 100%;
+                padding: 13px;
+                background: #2d6cdf;
+                color: #fff;
+                border: none;
+                border-radius: 10px;
+                font-size: 1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background 0.2s;
+                margin-top: 6px;
+                margin-bottom: 18px;
+            }
+
+                .btn-register:hover {
+                    background: #1a56c4;
+                }
+
+            .divider {
+                text-align: center;
+                color: #9ca3af;
+                font-size: 0.85rem;
+                margin-bottom: 16px;
+                position: relative;
+            }
+
+                .divider::before, .divider::after {
+                    content: '';
+                    position: absolute;
+                    top: 50%;
+                    width: 42%;
+                    height: 1px;
+                    background: #e5e7eb;
+                }
+
+                .divider::before {
+                    left: 0;
+                }
+
+                .divider::after {
+                    right: 0;
+                }
+
+            .link-btn {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                padding: 13px 16px;
+                border: 1.5px solid #e5e7eb;
+                border-radius: 10px;
+                background: #fff;
+                color: #374151;
+                font-size: 0.93rem;
+                text-decoration: none;
+                margin-bottom: 10px;
+                transition: border-color 0.2s, background 0.2s;
+            }
+
+                .link-btn:hover {
+                    border-color: #2d6cdf;
+                    background: #f0f6ff;
+                    color: #2d6cdf;
+                }
+
+                .link-btn .link-icon {
+                    color: #2d6cdf;
+                    font-size: 1.1rem;
+                }
+
+                .link-btn .arrow {
+                    color: #9ca3af;
+                }
+
+            .footer-text {
+                text-align: center;
+                margin-top: 18px;
+                font-size: 0.82rem;
+                color: #9ca3af;
+            }
+
+            .text-danger {
+                font-size: 0.82rem;
+                color: #e53e3e;
+                margin-top: 4px;
+                display: block;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="brand">
+        <span class="ps">PS</span> <span class="skill">skill</span>
+    </div>
+
+    <div class="card">
+        <h2>Create Account</h2>
+        <p class="subtitle">Register a new account to get started.</p>
+
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+
+            <div class="input-group-custom">
+                <label asp-for="Input.Email">Email</label>
+                <div class="input-wrapper">
+                    <span class="icon">✉</span>
+                    <input asp-for="Input.Email" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                </div>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <div class="input-group-custom">
+                <label asp-for="Input.Password">Password</label>
+                <div class="input-wrapper">
+                    <span class="icon">🔒</span>
+                    <input asp-for="Input.Password" autocomplete="new-password" aria-required="true" placeholder="Password" />
+                </div>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+
+            <div class="input-group-custom">
+                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                <div class="input-wrapper">
+                    <span class="icon"> </span>
+                    <input asp-for="Input.ConfirmPassword" autocomplete="new-password" aria-required="true" placeholder="Confirm Password" />
+                </div>
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <button id="registerSubmit" type="submit" class="btn-register">Create Account</button>
+        </form>
+
+        <div class="divider">OR</div>
+
+        <a asp-page="./Login" class="link-btn">
+            <span>
+                <span class="link-icon me-2"> </span> Already have an account? Log in
+            </span>
+            <span class="arrow">›</span>
+        </a>
+    </div>
+
+    <div class="footer-text">© 2026 PS skill. All rights reserved.</div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>

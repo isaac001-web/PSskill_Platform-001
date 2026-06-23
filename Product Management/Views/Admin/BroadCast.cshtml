@@ -1,0 +1,96 @@
+﻿@{
+    ViewData["Title"] = "Broadcast Message";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow rounded-4 overflow-hidden">
+
+                <div class="bg-warning p-4">
+                    <h2 class="fw-bold mb-1">
+                        <i class="bi bi-megaphone-fill me-2"></i>
+                        Broadcast Message
+                    </h2>
+                    <p class="mb-0">
+                        This message will be sent to ALL users.
+                    </p>
+                </div>
+
+                <div class="card-body p-4">
+
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success
+                            alert-dismissible fade show">
+                            @TempData["Success"]
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger
+                            alert-dismissible fade show">
+                            @TempData["Error"]
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Broadcast" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">
+                                Subject
+                            </label>
+                            <input type="text"
+                                   name="subject"
+                                   class="form-control form-control-lg
+                            rounded-3"
+                                   placeholder="e.g. System Maintenance Notice"
+                                   required />
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">
+                                Message
+                            </label>
+                            <textarea name="content"
+                                      rows="7"
+                                      class="form-control rounded-3"
+                                      placeholder="Write your broadcast message here..."
+                                      required></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between
+                            align-items-center">
+                            <a asp-action="Inbox"
+                               class="btn btn-outline-secondary
+                                rounded-pill px-4">
+                                Cancel
+                            </a>
+                            <button type="submit"
+                                    class="btn btn-warning
+                                rounded-pill px-5 fw-bold"
+                                    onclick="return confirm(
+                                'Send this message to ALL users?')">
+                                <i class="bi bi-megaphone-fill me-2"></i>
+                                Send to All Users
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,164 @@
+﻿@model IEnumerable<Product_Management.Models.Order>
+
+@{
+    ViewData["Title"] = "Manage Orders";
+}
+
+<style>
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .status-Pending {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .status-Processing {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .status-Shipped {
+        background: #ede9fe;
+        color: #7c3aed;
+    }
+
+    .status-Delivered {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .status-Cancelled {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .filter-btn {
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        border: 1.5px solid #e5e7eb;
+        background: #fff;
+        color: #374151;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: #111827;
+            color: #fff;
+            border-color: #111827;
+        }
+</style>
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between
+        align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-0">Manage Orders</h3>
+            <p class="text-muted mb-0" style="font-size:0.88rem;">
+                @Model.Count() total orders
+            </p>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- FILTERS -->
+    <div class="d-flex gap-2 mb-4 flex-wrap">
+        <a asp-action="Orders"
+           class="filter-btn @(ViewBag.CurrentStatus == "" ? "active" : "")">
+            All
+        </a>
+        @foreach (var s in Enum.GetValues<OrderStatus>())
+        {
+            <a asp-action="Orders"
+               asp-route-status="@s.ToString()"
+               class="filter-btn
+                @(ViewBag.CurrentStatus == s.ToString() ? "active" : "")">
+                @s.ToString()
+            </a>
+        }
+    </div>
+
+    <!-- ORDERS TABLE -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead style="background:#f9fafb;">
+                    <tr>
+                        <th class="px-4 py-3">Order</th>
+                        <th class="py-3">Customer</th>
+                        <th class="py-3">Date</th>
+                        <th class="py-3">Amount</th>
+                        <th class="py-3">Status</th>
+                        <th class="py-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr>
+                            <td class="px-4 py-3">
+                                <div class="fw-bold">
+                                    #@order.Id
+                                </div>
+
+                                
+                                <div class="text-muted"
+                                     style="font-size:0.75rem;">
+                                    @order.OrderItems.Count item(s)
+                                </div>
+                            </td>
+                            <td class="py-3">
+                                <div class="fw-semibold">
+                                    @(order.User?.FullName ?? order.CustomerName)
+                                </div>
+                                <div class="text-muted"
+                                     style="font-size:0.75rem;">
+                                    @order.Email
+                                </div>
+                            </td>
+                            <td class="py-3"
+                                style="font-size:0.82rem;">
+                                @order.OrderDate.ToString("dd MMM yyyy")
+                            </td>
+                            <td class="py-3 fw-bold">
+                                ₦@order.TotalAmount.ToString("N0")
+                            </td>
+                            <td class="py-3">
+                                <span class="status-badge
+                                    status-@order.Status.ToString()">
+                                    @order.Status.ToString()
+                                </span>
+                            </td>
+                            <td class="py-3">
+                                <a asp-action="OrderDetails"
+                                   asp-route-id="@order.Id"
+                                   class="btn btn-sm btn-outline-dark
+                                    rounded-pill px-3">
+                                    <i class="bi bi-eye me-1"></i>
+                                    Manage
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>

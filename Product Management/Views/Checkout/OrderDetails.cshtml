@@ -1,0 +1,439 @@
+﻿@model Product_Management.Models.Order
+
+@{
+    ViewData["Title"] = $"Order #{Model.Id}";
+}
+
+<style>
+    .info-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #f3f4f6;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
+    .info-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 4px;
+    }
+
+    .info-value {
+        font-size: 0.92rem;
+        color: #111827;
+        font-weight: 500;
+    }
+
+    .status-badge {
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .status-Pending {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .status-Processing {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .status-Shipped {
+        background: #ede9fe;
+        color: #7c3aed;
+    }
+
+    .status-Delivered {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .status-Cancelled {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    /* TIMELINE */
+    .timeline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 24px 0;
+        position: relative;
+    }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: #e5e7eb;
+            z-index: 0;
+        }
+
+    .timeline-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+        flex: 1;
+    }
+
+    .timeline-dot {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        color: #9ca3af;
+        margin-bottom: 8px;
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 2px #e5e7eb;
+        transition: all 0.3s;
+    }
+
+        .timeline-dot.done {
+            background: #10b981;
+            color: #fff;
+            box-shadow: 0 0 0 2px #10b981;
+        }
+
+        .timeline-dot.active {
+            background: #111827;
+            color: #fff;
+            box-shadow: 0 0 0 2px #111827;
+        }
+
+        .timeline-dot.cancelled {
+            background: #ef4444;
+            color: #fff;
+            box-shadow: 0 0 0 2px #ef4444;
+        }
+
+    .timeline-label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #9ca3af;
+        text-align: center;
+    }
+
+        .timeline-label.done {
+            color: #10b981;
+        }
+
+        .timeline-label.active {
+            color: #111827;
+        }
+
+    .order-item-img {
+        width: 56px;
+        height: 56px;
+        border-radius: 10px;
+        object-fit: cover;
+        background: #f9fafb;
+        flex-shrink: 0;
+    }
+</style>
+
+<div class="container py-4">
+
+    <!-- HEADER -->
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a asp-action="MyOrders"
+           class="btn btn-light rounded-circle"
+           style="width:38px; height:38px;
+            display:flex; align-items:center;
+            justify-content:center;">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <div>
+            <h3 class="fw-bold mb-0">Order #@Model.Id</h3>
+            <p class="text-muted mb-0" style="font-size:0.82rem;">
+                Placed on
+                @Model.OrderDate.ToString("dd MMM yyyy, hh:mm tt")
+            </p>
+        </div>
+        <span class="status-badge ms-2
+            status-@Model.Status.ToString()">
+            @Model.Status.ToString()
+        </span>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- LEFT COLUMN -->
+        <div class="col-lg-8">
+
+            <!-- TRACKING TIMELINE -->
+            <div class="info-card">
+                <h6 class="fw-bold mb-2">Order Tracking</h6>
+
+                @if (Model.Status == OrderStatus.Cancelled)
+                {
+                    <div class="alert alert-danger
+                        d-flex align-items-center
+                        gap-2 rounded-3 py-2 px-3 mt-3"
+                         style="font-size:0.85rem;">
+                        <i class="bi bi-x-circle-fill"></i>
+                        <span>
+                            This order was cancelled.
+                            @if (!string.IsNullOrEmpty(Model.CancelReason))
+                            {
+                                <strong> Reason: </strong>
+                                @Model.CancelReason
+                            }
+                        </span>
+                    </div>
+                }
+                else
+                {
+                    var steps = new[]
+                    {
+                        (OrderStatus.Pending,
+                         "bi-clock", "Pending"),
+                        (OrderStatus.Processing,
+                         "bi-gear", "Processing"),
+                        (OrderStatus.Shipped,
+                         "bi-truck", "Shipped"),
+                        (OrderStatus.Delivered,
+                         "bi-check-circle", "Delivered")
+                    };
+
+                    var currentStep = (int)Model.Status;
+
+                    <div class="timeline">
+                        @foreach (var (status, icon, label) in steps)
+                        {
+                            var stepIndex = (int)status;
+                            var dotClass = stepIndex < currentStep
+                                ? "done"
+                                : stepIndex == currentStep
+                                    ? "active" : "";
+
+                            <div class="timeline-step">
+                                <div class="timeline-dot @dotClass">
+                                    <i class="bi @icon"></i>
+                                </div>
+                                <div class="timeline-label @dotClass">
+                                    @label
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    @if (Model.LastUpdated.HasValue)
+                    {
+                        <div class="text-muted mt-2"
+                             style="font-size:0.78rem;">
+                            <i class="bi bi-clock-history me-1"></i>
+                            Last updated:
+                            @Model.LastUpdated.Value
+                            .ToString("dd MMM yyyy, hh:mm tt")
+                        </div>
+                    }
+                }
+            </div>
+
+            <!-- ORDER ITEMS -->
+            <div class="info-card">
+                <h6 class="fw-bold mb-3">Items Ordered</h6>
+
+                @foreach (var item in Model.OrderItems)
+                {
+                    <div class="d-flex align-items-center
+                        gap-3 py-3 border-bottom">
+
+                        @if (item.Product != null &&
+                            !string.IsNullOrEmpty(item.Product.ImageUrl))
+                        {
+                            <img src="~/images/@item.Product.ImageUrl"
+                                 class="order-item-img" />
+                        }
+                        else
+                        {
+                            <div class="order-item-img d-flex
+                                align-items-center
+                                justify-content-center
+                                bg-light">
+                                <i class="bi bi-image text-muted"></i>
+                            </div>
+                        }
+
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold"
+                                 style="font-size:0.92rem;">
+                                @(item.Product?.Name ?? "Product")
+                            </div>
+                            <div class="text-muted"
+                                 style="font-size:0.78rem;">
+                                Qty: @item.Quantity ×
+                                ₦@item.Price.ToString("N0")
+                            </div>
+                        </div>
+
+                        <div class="fw-bold"
+                             style="font-size:0.92rem;">
+                            ₦@((item.Price * item.Quantity)
+                                                            .ToString("N0"))
+                        </div>
+
+                    </div>
+                }
+
+                <!-- TOTAL -->
+                <div class="d-flex justify-content-between
+                    align-items-center pt-3">
+                    <span class="fw-bold">Order Total</span>
+                    <span class="fw-bold fs-5">
+                        ₦@Model.TotalAmount.ToString("N0")
+                    </span>
+                </div>
+            </div>
+
+            <!-- CANCEL BUTTON — only if pending -->
+            @if (Model.Status == OrderStatus.Pending)
+            {
+                <button class="btn btn-outline-danger rounded-pill px-4"
+                        data-bs-toggle="modal"
+                        data-bs-target="#cancelModal">
+                    <i class="bi bi-x-circle me-2"></i>
+                    Cancel This Order
+                </button>
+            }
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="col-lg-4">
+
+            <!-- DELIVERY INFO -->
+            <div class="info-card">
+                <h6 class="fw-bold mb-3">Delivery Details</h6>
+                <div class="mb-3">
+                    <div class="info-label">Full Name</div>
+                    <div class="info-value">
+                        @Model.CustomerName
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">@Model.Email</div>
+                </div>
+                <div class="mb-3">
+                    <div class="info-label">Phone</div>
+                    <div class="info-value">@Model.PhoneNumber</div>
+                </div>
+                <div>
+                    <div class="info-label">Delivery Address</div>
+                    <div class="info-value">@Model.Address</div>
+                </div>
+            </div>
+
+            <!-- ORDER SUMMARY -->
+            <div class="info-card">
+                <h6 class="fw-bold mb-3">Order Summary</h6>
+                <div class="d-flex justify-content-between mb-2"
+                     style="font-size:0.85rem;">
+                    <span class="text-muted">Order ID</span>
+                    <span class="fw-semibold">#@Model.Id</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2"
+                     style="font-size:0.85rem;">
+                    <span class="text-muted">Date Placed</span>
+                    <span class="fw-semibold">
+                        @Model.OrderDate.ToString("dd MMM yyyy")
+                    </span>
+                </div>
+                <div class="d-flex justify-content-between mb-2"
+                     style="font-size:0.85rem;">
+                    <span class="text-muted">Items</span>
+                    <span class="fw-semibold">
+                        @Model.OrderItems.Count
+                    </span>
+                </div>
+                <div class="d-flex justify-content-between mb-2"
+                     style="font-size:0.85rem;">
+                    <span class="text-muted">Status</span>
+                    <span class="status-badge
+                        status-@Model.Status.ToString()"
+                          style="font-size:0.72rem;">
+                        @Model.Status.ToString()
+                    </span>
+                </div>
+                <hr />
+                <div class="d-flex justify-content-between">
+                    <span class="fw-bold">Total</span>
+                    <span class="fw-bold fs-5">
+                        ₦@Model.TotalAmount.ToString("N0")
+                    </span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- CANCEL MODAL -->
+<div class="modal fade" id="cancelModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">
+                    Cancel Order #@Model.Id
+                </h5>
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted" style="font-size:0.88rem;">
+                    Please give a reason for cancelling this order.
+                    This cannot be undone.
+                </p>
+                <form asp-action="CancelOrder"
+                      asp-controller="Checkout"
+                      method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden"
+                           name="orderId"
+                           value="@Model.Id" />
+                    <div class="mb-3">
+                        <textarea name="reason"
+                                  class="form-control rounded-3"
+                                  rows="3"
+                                  placeholder="e.g. Changed my mind..."
+                                  required></textarea>
+                    </div>
+                    <div class="d-flex gap-2 justify-content-end">
+                        <button type="button"
+                                class="btn btn-outline-secondary
+                            rounded-pill px-4"
+                                data-bs-dismiss="modal">
+                            Keep Order
+                        </button>
+                        <button type="submit"
+                                class="btn btn-danger
+                            rounded-pill px-4">
+                            Confirm Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

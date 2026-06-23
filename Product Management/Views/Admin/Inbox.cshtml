@@ -1,0 +1,150 @@
+﻿@model IEnumerable<Product_Management.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "Admin Inbox";
+    var unreadCounts = ViewBag.UnreadCounts
+        as Dictionary<string, int>
+        ?? new Dictionary<string, int>();
+}
+
+<style>
+    .chat-list-wrapper {
+        max-width: 680px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .chat-list-header {
+        background: #075e54;
+        color: #fff;
+        padding: 18px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .chat-list-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 20px;
+        border-bottom: 1px solid #f0f2f5;
+        text-decoration: none;
+        color: inherit;
+        transition: background 0.15s;
+    }
+
+        .chat-list-item:hover {
+            background: #f5f6fa;
+            color: inherit;
+        }
+
+    .chat-avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .chat-preview {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .chat-name {
+        font-weight: 700;
+        font-size: 0.97rem;
+        color: #111;
+    }
+
+    .chat-last-msg {
+        font-size: 0.83rem;
+        color: #888;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .unread-badge {
+        background: #25d366;
+        color: #fff;
+        border-radius: 50%;
+        min-width: 22px;
+        height: 22px;
+        font-size: 0.72rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 4px;
+        flex-shrink: 0;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="chat-list-wrapper">
+
+        <!-- HEADER -->
+        <div class="chat-list-header">
+            <div class="fw-bold fs-5">
+                <i class="bi bi-inbox-fill me-2"></i> Inbox
+            </div>
+            <a asp-action="Broadcast"
+               class="btn btn-sm"
+               style="background:#ffc107; color:#000;
+                border-radius:20px; padding:6px 18px;">
+                <i class="bi bi-megaphone-fill me-1"></i>
+                Broadcast
+            </a>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-chat-dots display-1"
+                   style="color:#25d366;"></i>
+                <h5 class="mt-3 fw-bold">No conversations yet</h5>
+                <p class="text-muted">
+                    No users have sent messages yet.
+                </p>
+            </div>
+        }
+        else
+        {
+            @foreach (var user in Model)
+            {
+                var unread = unreadCounts.ContainsKey(user.Id)
+                    ? unreadCounts[user.Id] : 0;
+
+                <a asp-action="Conversation"
+                   asp-route-userId="@user.Id"
+                   class="chat-list-item">
+
+                    <img src="~/profiles/@(user.ProfileImage ?? "default.png")"
+                         class="chat-avatar" />
+
+                    <div class="chat-preview">
+                        <div class="d-flex justify-content-between">
+                            <span class="chat-name">
+                                @(user.FullName ?? user.Email)
+                            </span>
+                        </div>
+                        <div class="chat-last-msg">
+                            @user.Email
+                        </div>
+                    </div>
+
+                    @if (unread > 0)
+                    {
+                        <span class="unread-badge">@unread</span>
+                    }
+
+                </a>
+            }
+        }
+
+    </div>
+</div>

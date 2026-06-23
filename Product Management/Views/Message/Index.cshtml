@@ -1,0 +1,96 @@
+﻿@model IEnumerable<Product_Management.Models.Message>
+
+@{
+    ViewData["Title"] = "Messages";
+}
+
+<div class="container py-4">
+
+    <div class="row">
+
+        <div class="col-lg-8 mx-auto">
+
+            <div class="card shadow border-0 rounded-4">
+
+                <div class="card-body p-4">
+
+                    <h3 class="fw-bold mb-4">
+
+                        Messages
+
+                    </h3>
+
+                    <!-- SUCCESS MESSAGE -->
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">
+
+                            @TempData["Success"]
+
+                        </div>
+                    }
+
+                    <!-- SEND MESSAGE -->
+
+                    <form asp-action="Send"
+                          method="post"
+                          class="mb-4">
+
+                        <div class="mb-3">
+
+                            <textarea name="content"
+                                      class="form-control"
+                                      rows="4"
+                                      placeholder="Write your message..."></textarea>
+
+                        </div>
+
+                        <button class="btn btn-dark rounded-pill px-4">
+
+                            Send Message
+
+                        </button>
+
+                    </form>
+
+                    <hr />
+
+                    <!-- MESSAGE LIST -->
+                    @foreach (var item in Model)
+                    {
+                        <div class="border rounded-4 p-3 mb-3">
+
+                            <div class="d-flex justify-content-between">
+
+                                <strong>
+
+                                    @item.Sender?.FullName
+
+                                </strong>
+
+                                <small class="text-muted">
+
+                                    @item.SentAt.ToString("dd MMM yyyy hh:mm tt")
+
+                                </small>
+
+                            </div>
+
+                            <p class="mt-2 mb-0">
+
+                                @item.Content
+
+                            </p>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

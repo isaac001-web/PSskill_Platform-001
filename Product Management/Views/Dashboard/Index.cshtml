@@ -1,0 +1,132 @@
+﻿@model IEnumerable<Product_Management.Models.Order>
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container mt-5">
+
+    <!-- PAGE HEADER -->
+    <div class="mb-5">
+
+        <h1 class="fw-bold">
+            Welcome,
+            @ViewBag.UserName
+        </h1>
+
+        <p class="text-muted">
+            Manage your account and orders.
+        </p>
+
+    </div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="row g-4 mb-5">
+
+        <!-- TOTAL ORDERS -->
+        <div class="col-md-6">
+
+            <div class="card shadow-sm border-0 rounded-4">
+
+                <div class="card-body p-4">
+
+                    <h5 class="text-muted">
+                        Total Orders
+                    </h5>
+
+                    <h1 class="fw-bold">
+                        @ViewBag.TotalOrders
+                    </h1>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- TOTAL SPENT -->
+        <div class="col-md-6">
+
+            <div class="card shadow-sm border-0 rounded-4">
+
+                <div class="card-body p-4">
+
+                    <h5 class="text-muted">
+                        Total Spent
+                    </h5>
+
+                    <h1 class="fw-bold text-success">
+                        ₦@ViewBag.TotalSpent
+                    </h1>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- RECENT ORDERS -->
+    <div class="card shadow-sm border-0 rounded-4">
+
+        <div class="card-body p-4">
+
+            <h4 class="fw-bold mb-4">
+                Recent Orders
+            </h4>
+
+            <table class="table align-middle">
+
+                <thead>
+
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Total</th>
+                        <th>Date</th>
+                    </tr>
+
+                         <button type="button"
+                            class="btn btn-primary"
+                            onclick="location.href='@Url.Action("MyOrders","Checkout")'">Track Your Orders</button>
+                    
+                </thead>
+
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                #@item.Id
+                            </td>
+
+                            <td>
+                                ₦@item.TotalAmount
+                            </td>
+
+                            <td>
+                                @item.OrderDate
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+    body {
+        background: #f5f7fb;
+    }
+
+</style>

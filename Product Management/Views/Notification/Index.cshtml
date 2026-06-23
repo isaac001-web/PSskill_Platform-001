@@ -1,0 +1,63 @@
+﻿@model IEnumerable<Product_Management.Models.Notification>
+
+@{
+    ViewData["Title"] = "Notifications";
+}
+
+<div class="container py-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2 class="fw-bold">
+
+            Notifications
+
+        </h2>
+
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info rounded-4">
+
+            No notifications available.
+
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm rounded-4">
+
+            <div class="card-body">
+
+                @foreach (var item in Model)
+                {
+                    <div class="border-bottom py-3">
+
+                        <h5 class="fw-bold mb-1">
+
+                            @item.Title
+
+                        </h5>
+
+                        <p class="text-muted mb-1">
+
+                            @item.Message
+
+                        </p>
+
+                        <small class="text-secondary">
+
+                            @item.CreatedAt.ToString("dd MMM yyyy hh:mm tt")
+
+                        </small>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+    }
+
+</div>

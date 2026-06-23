@@ -1,0 +1,296 @@
+﻿@model Product_Management.Models.Order
+
+@{
+    ViewData["Title"] = $"Order #{Model.Id}";
+}
+
+<style>
+    .status-badge {
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .status-Pending {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .status-Processing {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .status-Shipped {
+        background: #ede9fe;
+        color: #7c3aed;
+    }
+
+    .status-Delivered {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .status-Cancelled {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .info-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #f3f4f6;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
+    .info-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 4px;
+    }
+
+    .info-value {
+        font-size: 0.92rem;
+        color: #111827;
+        font-weight: 500;
+    }
+</style>
+
+<div class="container py-4">
+
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a asp-action="Orders"
+           class="btn btn-light rounded-circle"
+           style="width:38px;height:38px;
+            display:flex;align-items:center;
+            justify-content:center;">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <div>
+            <h3 class="fw-bold mb-0">Order #@Model.Id</h3>
+            <p class="text-muted mb-0" style="font-size:0.82rem;">
+                Placed @Model.OrderDate.ToString("dd MMM yyyy, hh:mm tt")
+            </p>
+        </div>
+        <span class="status-badge ms-2
+            status-@Model.Status.ToString()">
+            @Model.Status.ToString()
+        </span>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+
+        <!-- LEFT COLUMN -->
+        <div class="col-lg-8">
+
+            <!-- ORDER ITEMS -->
+            <div class="info-card">
+                <h6 class="fw-bold mb-3">Order Items</h6>
+                @foreach (var item in Model.OrderItems)
+                {
+                    <div class="d-flex align-items-center
+                        gap-3 py-3 border-bottom">
+                        @if (item.Product != null &&
+                            !string.IsNullOrEmpty(item.Product.ImageUrl))
+                        {
+                            <img src="~/images/@item.Product.ImageUrl"
+                                 style="width:52px;height:52px;
+                            border-radius:10px;
+                            object-fit:cover;" />
+                        }
+                        else
+                        {
+                            <div style="width:52px;height:52px;
+                                border-radius:10px;
+                                background:#f9fafb;
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;">
+                                <i class="bi bi-image text-muted"></i>
+                            </div>
+                        }
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold">
+                                @(item.Product?.Name ?? "Product")
+                            </div>
+                            <div class="text-muted"
+                                 style="font-size:0.78rem;">
+                                Qty: @item.Quantity ×
+                                ₦@item.Price.ToString("N0")
+                            </div>
+                        </div>
+                        <div class="fw-bold">
+                            ₦@((item.Price * item.Quantity).ToString("N0"))
+                        </div>
+                    </div>
+                }
+                <div class="d-flex justify-content-between
+                    align-items-center pt-3">
+                    <span class="fw-bold">Total</span>
+                    <span class="fw-bold fs-5">
+                        ₦@Model.TotalAmount.ToString("N0")
+                    </span>
+                </div>
+            </div>
+
+            <!-- UPDATE STATUS -->
+            @if (Model.Status != OrderStatus.Delivered &&
+                 Model.Status != OrderStatus.Cancelled)
+            {
+                <div class="info-card">
+                    <h6 class="fw-bold mb-3">Update Order Status</h6>
+                    <form asp-action="UpdateOrderStatus"
+                          method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden"
+                               name="orderId"
+                               value="@Model.Id" />
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold"
+                                   style="font-size:0.85rem;">
+                                New Status
+                            </label>
+                            <select name="status"
+                                    class="form-select rounded-3"
+                                    id="statusSelect"
+                                    onchange="toggleReason(this)">
+                                @foreach (var s in Enum.GetValues<OrderStatus>())
+                                {
+                                    if (s != Model.Status)
+                                    {
+                                        <option value="@s">@s.ToString()</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3" id="reasonBox"
+                             style="display:none;">
+                            <label class="form-label fw-semibold"
+                                   style="font-size:0.85rem;">
+                                Cancel Reason
+                            </label>
+                            <textarea name="reason"
+                                      class="form-control rounded-3"
+                                      rows="3"
+                                      placeholder="Reason for cancellation...">
+                            </textarea>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-dark rounded-pill px-5">
+                            <i class="bi bi-check2 me-2"></i>
+                            Update Status
+                        </button>
+                    </form>
+                </div>
+            }
+
+            @if (Model.Status == OrderStatus.Cancelled &&
+                 !string.IsNullOrEmpty(Model.CancelReason))
+            {
+                <div class="alert alert-danger rounded-3">
+                    <strong>Cancel Reason:</strong>
+                    @Model.CancelReason
+                </div>
+            }
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="col-lg-4">
+
+            <!-- CUSTOMER INFO -->
+            <div class="info-card">
+                <h6 class="fw-bold mb-3">Customer Details</h6>
+                <div class="mb-3">
+                    <div class="info-label">Name</div>
+                    <div class="info-value">@Model.CustomerName</div>
+                </div>
+                <div class="mb-3">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">@Model.Email</div>
+                </div>
+                <div class="mb-3">
+                    <div class="info-label">Phone</div>
+                    <div class="info-value">@Model.PhoneNumber</div>
+                </div>
+                <div>
+                    <div class="info-label">Address</div>
+                    <div class="info-value">@Model.Address</div>
+                </div>
+            </div>
+
+            <!-- ORDER SUMMARY -->
+            <div class="info-card">
+                <h6 class="fw-bold mb-3">Order Summary</h6>
+                <div class="d-flex justify-content-between mb-2"
+                     style="font-size:0.85rem;">
+                    <span class="text-muted">Order ID</span>
+                    <span class="fw-semibold">#@Model.Id</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2"
+                     style="font-size:0.85rem;">
+                    <span class="text-muted">Order Date</span>
+                    <span class="fw-semibold">
+                        @Model.OrderDate.ToString("dd MMM yyyy")
+                    </span>
+                </div>
+                <div class="d-flex justify-content-between mb-2"
+                     style="font-size:0.85rem;">
+                    <span class="text-muted">Items</span>
+                    <span class="fw-semibold">
+                        @Model.OrderItems.Count
+                    </span>
+                </div>
+                @if (Model.LastUpdated.HasValue)
+                {
+                    <div class="d-flex justify-content-between mb-2"
+                         style="font-size:0.85rem;">
+                        <span class="text-muted">Last Updated</span>
+                        <span class="fw-semibold">
+                            @Model.LastUpdated.Value.ToString("dd MMM yyyy")
+                        </span>
+                    </div>
+                }
+                <hr />
+                <div class="d-flex justify-content-between">
+                    <span class="fw-bold">Total</span>
+                    <span class="fw-bold fs-5">
+                        ₦@Model.TotalAmount.ToString("N0")
+                    </span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        function toggleReason(select) {
+            const reasonBox =
+                document.getElementById('reasonBox');
+            reasonBox.style.display =
+                select.value === 'Cancelled' ? 'block' : 'none';
+        }
+    </script>
+}

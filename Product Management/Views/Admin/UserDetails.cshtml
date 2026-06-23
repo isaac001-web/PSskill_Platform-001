@@ -1,0 +1,290 @@
+﻿@model Product_Management.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "User Details";
+    var roles = ViewBag.Roles as IList<string>
+        ?? new List<string>();
+    var orders = ViewBag.Orders as List<Product_Management.Models.Order>
+        ?? new List<Product_Management.Models.Order>();
+    var allRoles = ViewBag.AllRoles as List<string>
+        ?? new List<string>();
+}
+
+<style>
+    .info-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #f3f4f6;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
+    .role-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+
+    .role-Admin {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .role-User {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .status-badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+
+    .status-Pending {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .status-Processing {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .status-Shipped {
+        background: #ede9fe;
+        color: #7c3aed;
+    }
+
+    .status-Delivered {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .status-Cancelled {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+</style>
+
+<div class="container py-4">
+
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a asp-action="Users"
+           class="btn btn-light rounded-circle"
+           style="width:38px;height:38px;
+            display:flex;align-items:center;
+            justify-content:center;">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <h3 class="fw-bold mb-0">User Details</h3>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["Error"]
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+
+        <!-- LEFT -->
+        <div class="col-lg-4">
+
+            <div class="info-card text-center">
+                <img src="@(string.IsNullOrEmpty(Model.ProfileImage)
+                                         ? "/profile/default.png"
+                                         : "/profiles/" + Model.ProfileImage)"
+                     style="width:90px;height:90px;border-radius:50%;
+                object-fit:cover;
+                border:3px solid #f59e0b;
+                margin-bottom:16px;" />
+                <h5 class="fw-bold mb-1">
+                    @(Model.FullName ?? "No Name")
+                </h5>
+                <div class="text-muted mb-3"
+                     style="font-size:0.85rem;">
+                    @Model.Email
+                </div>
+                <div class="d-flex justify-content-center
+                    gap-2 flex-wrap mb-3">
+                    @foreach (var role in roles)
+                    {
+                        <span class="role-badge role-@role">
+                            @role
+                        </span>
+                    }
+                </div>
+                <div class="text-muted" style="font-size:0.78rem;">
+                    Member since
+                    @Model.CreatedAt.ToString("dd MMM yyyy")
+                </div>
+            </div>
+
+            <!-- CONTACT INFO -->
+            <div class="info-card">
+                <h6 class="fw-bold mb-3">Contact Info</h6>
+                <div class="mb-2" style="font-size:0.85rem;">
+                    <i class="bi bi-telephone me-2 text-muted"></i>
+                    @(Model.PhoneNumber ?? "Not provided")
+                </div>
+                <div class="mb-2" style="font-size:0.85rem;">
+                    <i class="bi bi-geo-alt me-2 text-muted"></i>
+                    @(Model.Address ?? "Not provided")
+                </div>
+                <div style="font-size:0.85rem;">
+                    <i class="bi bi-building me-2 text-muted"></i>
+                    @(Model.City ?? "")
+                    @(Model.State ?? "")
+                    @(Model.Country ?? "")
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="col-lg-8">
+
+            <!-- ROLE MANAGEMENT -->
+            <div class="info-card">
+                <h6 class="fw-bold mb-3">Manage Roles</h6>
+                <div class="d-flex gap-3 flex-wrap">
+                    @foreach (var role in allRoles)
+                    {
+                        var hasRole = roles.Contains(role);
+                        <div class="d-flex align-items-center gap-2
+                            border rounded-3 p-3"
+                             style="min-width:160px;">
+                            <div class="flex-grow-1">
+                                <div class="fw-semibold"
+                                     style="font-size:0.88rem;">
+                                    @role
+                                </div>
+                                <div style="font-size:0.72rem;
+                                    color:@(hasRole ? "#16a34a" : "#9ca3af");">
+                                    @(hasRole ? "Assigned" : "Not assigned")
+                                </div>
+                            </div>
+                            @if (hasRole)
+                            {
+                                <form asp-action="RemoveRole"
+                                      method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden"
+                                           name="userId"
+                                           value="@Model.Id" />
+                                    <input type="hidden"
+                                           name="role"
+                                           value="@role" />
+                                    <button type="submit"
+                                            class="btn btn-sm
+                                        btn-outline-danger
+                                        rounded-pill px-3"
+                                            style="font-size:0.75rem;">
+                                        Remove
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="AssignRole"
+                                      method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden"
+                                           name="userId"
+                                           value="@Model.Id" />
+                                    <input type="hidden"
+                                           name="role"
+                                           value="@role" />
+                                    <button type="submit"
+                                            class="btn btn-sm
+                                        btn-dark
+                                        rounded-pill px-3"
+                                            style="font-size:0.75rem;">
+                                        Assign
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- ORDER HISTORY -->
+            <div class="info-card">
+                <h6 class="fw-bold mb-3">
+                    Order History
+                    <span class="text-muted fw-normal"
+                          style="font-size:0.82rem;">
+                        (@orders.Count orders)
+                    </span>
+                </h6>
+                @if (!orders.Any())
+                {
+                    <p class="text-muted" style="font-size:0.85rem;">
+                        No orders placed yet.
+                    </p>
+                }
+                else
+                {
+                    @foreach (var order in orders.Take(5))
+                    {
+                        <div class="d-flex align-items-center
+                            justify-content-between
+                            py-2 border-bottom">
+                            <div>
+                                <div class="fw-semibold"
+                                     style="font-size:0.88rem;">
+                                    Order #@order.Id
+                                </div>
+                                <div class="text-muted"
+                                     style="font-size:0.75rem;">
+                                    @order.OrderDate.ToString("dd MMM yyyy")
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fw-bold"
+                                      style="font-size:0.88rem;">
+                                    ₦@order.TotalAmount.ToString("N0")
+                                </span>
+                                <span class="status-badge
+                                    status-@order.Status.ToString()">
+                                    @order.Status.ToString()
+                                </span>
+                            </div>
+                        </div>
+                    }
+                    @if (orders.Count > 5)
+                    {
+                        <div class="text-center mt-3">
+                            <a asp-action="Orders"
+                               class="btn btn-sm btn-outline-dark
+                                rounded-pill px-4"
+                               style="font-size:0.78rem;">
+                                View All Orders
+                            </a>
+                        </div>
+                    }
+                }
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

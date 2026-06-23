@@ -1,0 +1,256 @@
+﻿@model Product_Management.Models.Product
+
+@{
+    ViewData["Title"] = "Product Details";
+
+    double averageRating = 0;
+
+    if (Model.Reviews != null && Model.Reviews.Any())
+    {
+        averageRating = Model.Reviews.Average(r => r.Rating);
+    }
+}
+
+<h1>Product Details</h1>
+
+<hr />
+
+<div class="card p-4 shadow">
+
+    <!-- Product Image -->
+    <div class="mb-4 text-center">
+
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <img src="~/images/@Model.ImageUrl"
+                 width="250"
+                 height="250"
+                 style="object-fit:cover;border-radius:15px;" />
+        }
+
+    </div>
+
+    <dl class="row">
+
+        <dt class="col-sm-3">
+            Product Id
+        </dt>
+
+        <dd class="col-sm-9">
+            @Model.Id
+        </dd>
+
+        <dt class="col-sm-3">
+            Product Name
+        </dt>
+
+        <dd class="col-sm-9">
+            @Model.Name
+        </dd>
+
+        <dt class="col-sm-3">
+            Price
+        </dt>
+
+        <dd class="col-sm-9">
+            ₦@Model.Price
+        </dd>
+
+        <dt class="col-sm-3">
+            Quantity
+        </dt>
+
+        <dd class="col-sm-9">
+            @Model.Quantity
+        </dd>
+
+        <dt class="col-sm-3">
+            Rating
+        </dt>
+
+        <dd class="col-sm-9">
+
+            @if (averageRating > 0)
+            {
+                <span class="text-warning fs-5">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        if (i <= Math.Round(averageRating))
+                        {
+                            <span>★</span>
+                        }
+                        else
+                        {
+                            <span>☆</span>
+                        }
+                    }
+                </span>
+
+                <span class="ms-2">
+                    (@averageRating.ToString("0.0") / 5)
+                </span>
+            }
+            else
+            {
+                <span class="text-muted">
+                    No ratings yet
+                </span>
+            }
+
+        </dd>
+
+    </dl>
+
+</div>
+
+<br />
+
+<!-- Buttons -->
+<a asp-action="Edit"
+   asp-route-id="@Model.Id"
+   class="btn btn-warning">
+    Edit
+</a>
+
+<a asp-action="Index"
+   class="btn btn-secondary">
+    Back to List
+</a>
+
+<hr class="mt-5" />
+
+<!-- REVIEWS SECTION -->
+<div class="card shadow-sm">
+
+    <div class="card-header bg-dark text-white">
+
+        <h4 class="mb-0">
+            Customer Reviews
+        </h4>
+
+    </div>
+
+    <div class="card-body">
+
+        @if (Model.Reviews != null && Model.Reviews.Any())
+        {
+            foreach (var review in Model.Reviews.OrderByDescending(r => r.ReviewDate))
+            {
+                <div class="border rounded p-3 mb-3">
+
+                    <div class="d-flex justify-content-between">
+
+                        <strong>
+                            @(review.User?.FullName ?? "Customer")
+                        </strong>
+
+                        <small class="text-muted">
+                            @review.ReviewDate.ToString("dd MMM yyyy")
+                        </small>
+
+                    </div>
+
+                    <div class="text-warning fs-5">
+
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            if (i <= review.Rating)
+                            {
+                                <span>★</span>
+                            }
+                            else
+                            {
+                                <span>☆</span>
+                            }
+                        }
+
+                    </div>
+
+                    <p class="mt-2 mb-0">
+                        @review.Comment
+                    </p>
+
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info">
+
+                No reviews yet.
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+<hr />
+
+<!-- ADD REVIEW FORM -->
+<div class="card shadow-sm">
+
+    <div class="card-header">
+
+        <h4 class="mb-0">
+            Leave a Review
+        </h4>
+
+    </div>
+
+    <div class="card-body">
+
+        <form asp-action="AddReview" method="post">
+
+            <input type="hidden"
+                   name="ProductId"
+                   value="@Model.Id" />
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Rating
+                </label>
+
+                <select name="Rating"
+                        class="form-select"
+                        required>
+
+                    <option value="">Select Rating</option>
+                    <option value="5">★★★★★ Excellent</option>
+                    <option value="4">★★★★ Very Good</option>
+                    <option value="3">★★★ Good</option>
+                    <option value="2">★★ Fair</option>
+                    <option value="1">★ Poor</option>
+
+                </select>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Review
+                </label>
+
+                <textarea name="Comment"
+                          class="form-control"
+                          rows="4"
+                          required>
+                </textarea>
+
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary">
+
+                Submit Review
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>

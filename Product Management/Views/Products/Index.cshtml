@@ -1,0 +1,182 @@
+﻿@model IEnumerable<Product_Management.Models.Product>
+
+@{
+    ViewData["Title"] = "Products List";
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    string search = ViewBag.Search as string;
+}
+
+<h1 class="mb-4">Products List</h1>
+
+<!-- TOP ACTION BAR -->
+<div class="row mb-3">
+
+    <!-- SEARCH BOX -->
+    <div class="col-md-6">
+
+        <form method="get" asp-action="Index">
+
+            <div class="input-group">
+
+                <input type="text"
+                       name="search"
+                       value="@search"
+                       class="form-control"
+                       placeholder="Search products by name..." />
+
+                <button class="btn btn-dark">
+                    Search
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- ADD BUTTON -->
+    <div class="col-md-6 text-end">
+
+        <a asp-action="Create"
+           class="btn btn-primary">
+            Add New Product
+        </a>
+
+    </div>
+
+</div>
+
+<!-- TABLE -->
+<table class="table table-bordered table-striped table-hover">
+
+    <thead class="table-dark">
+
+        <tr>
+            <th>Image</th>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Actions</th>
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        @if (Model.Any())
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+
+                    <td>
+
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <img src="~/images/@item.ImageUrl"
+                                 width="80"
+                                 height="80"
+                                 style="object-fit:cover;
+                            border-radius:10px;" />
+                        }
+                        else
+                        {
+                            <span>No Image</span>
+                        }
+
+                    </td>
+
+                    <td>@item.Id</td>
+                    <td>@item.Name</td>
+                    <td>@item.Price</td>
+                    <td>@item.Quantity</td>
+
+                    <td>
+
+                        <a asp-action="Details"
+                           asp-route-id="@item.Id"
+                           class="btn btn-info btn-sm">
+                            Details
+                        </a>
+
+                        <a asp-action="Edit"
+                           asp-route-id="@item.Id"
+                           class="btn btn-warning btn-sm">
+                            Edit
+                        </a>
+
+                        <a asp-action="Delete"
+                           asp-route-id="@item.Id"
+                           class="btn btn-danger btn-sm">
+                            Delete
+                        </a>
+
+
+                    </td>
+
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" class="text-center text-muted">
+                    No products found.
+                </td>
+            </tr>
+        }
+
+    </tbody>
+
+</table>
+
+<!-- PAGINATION -->
+<nav>
+
+    <ul class="pagination justify-content-center">
+
+        <!-- PREVIOUS -->
+        <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+
+            <a class="page-link"
+               asp-action="Index"
+               asp-route-page="@(currentPage - 1)"
+               asp-route-search="@search">
+                Previous
+            </a>
+
+        </li>
+
+        <!-- PAGE NUMBERS -->
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <li class="page-item @(i == currentPage ? "active" : "")">
+
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@i"
+                   asp-route-search="@search">
+                    @i
+                </a>
+
+            </li>
+        }
+
+        <!-- NEXT -->
+        <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+
+            <a class="page-link"
+               asp-action="Index"
+               asp-route-page="@(currentPage + 1)"
+               asp-route-search="@search">
+                Next
+            </a>
+
+        </li>
+
+    </ul>
+
+</nav>

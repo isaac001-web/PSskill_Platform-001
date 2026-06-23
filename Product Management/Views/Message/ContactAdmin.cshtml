@@ -1,0 +1,76 @@
+﻿@{
+    ViewData["Title"] = "Contact Admin";
+}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow rounded-4 overflow-hidden">
+
+                <div class="bg-dark text-white p-4">
+                    <h2 class="fw-bold mb-1">Contact Admin</h2>
+                    <p class="mb-0 text-light">Send a message directly to the administrator.</p>
+                </div>
+
+                <div class="card-body p-4">
+
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show">
+                            @TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            @TempData["Error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="ContactAdmin" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Subject</label>
+                            <input type="text"
+                                   name="subject"
+                                   class="form-control form-control-lg rounded-3"
+                                   placeholder="Enter message subject"
+                                   required />
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Message</label>
+                            <textarea name="content"
+                                      rows="6"
+                                      class="form-control rounded-3"
+                                      placeholder="Write your message here..."
+                                      required></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a asp-action="Inbox" class="btn btn-outline-secondary rounded-pill px-4">
+                                Back to Inbox
+                            </a>
+                            <button type="submit" class="btn btn-dark rounded-pill px-5">
+                                <i class="bi bi-send-fill me-2"></i> Send Message
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
